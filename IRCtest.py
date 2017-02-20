@@ -16,9 +16,9 @@ __version__ = '$Id: 229b3e02cf110f5e9d7f8d16c60906ee9769b7af $'
 
 import re
 
-import wikipedia as pywikibot
-import externals
-externals.check_setup('irclib')
+import pywikibot
+#import externals
+#externals.check_setup('irclib')
 from ircbot import SingleServerIRCBot
 
 
