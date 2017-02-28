@@ -112,7 +112,7 @@ class newArticleThread(object):
             return
 
         # check for disambig
-        if page.isDisambig() or u'{{Ujednoznacznienie' in page.text:
+        if page.isDisambig() or u'{{Ujednoznacznienie' in page.text or u'{{ujednoznacznienie' in page.text:
             pywikibot.output(u'Disambig')
             return
         # check if new page has categories
@@ -190,7 +190,8 @@ class ArtNoDisp(SingleServerIRCBot):
         text = unicode(e.arguments() [ 0 ], 'utf-8')
         #pywikibot.output(u'CONNECTION:%s' % unicode(c[ 0 ], 'utf-8'))
         #pywikibot.output(u'SOURCE:%s' % source)
-        #pywikibot.output(u'TEXT:%s' % text)
+        if u'move' in text:
+            pywikibot.output(u'TEXT move:%s' % text)
         
         
         match = self.re_edit.match(e.arguments()[0])
