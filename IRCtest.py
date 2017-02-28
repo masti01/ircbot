@@ -106,10 +106,10 @@ class newArticleThread(object):
         text = page.text
 
         #check for obvious experiments
-        if not self.spacesPresent(textlib.removeDisabledParts(text)):
-            page.text = u'{{ek|artykuł nie zawiera spacji, prawdopodobnie eksperyment edycyjny}}\n' + page.text
-            page.save(summary=u'{{ek}} - artykuł nie zawiera spacji, prawdopodobnie eksperyment edycyjny')
-            return
+        #if not self.spacesPresent(textlib.removeDisabledParts(text)):
+        #    page.text = u'{{ek|artykuł nie zawiera spacji, prawdopodobnie eksperyment edycyjny}}\n' + page.text
+        #    page.save(summary=u'{{ek}} - artykuł nie zawiera spacji, prawdopodobnie eksperyment edycyjny')
+        #    return
 
         # check for disambig
         if page.isDisambig() or u'{{Ujednoznacznienie' in page.text or u'{{ujednoznacznienie' in page.text:
