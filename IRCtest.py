@@ -56,13 +56,13 @@ class userPageThread(object):
             #text = re.sub('\[\[kategoria', '[[:Kategoria', text, flags=re.I)
             pywikibot.output(u'Kategorie usunięte')
             page.text = text
-            page.save(summary=u'Bot usuwa stronę użytkownika z kategorii', apply_cosmetic_changes=False)
+            #page.save(summary=u'Bot usuwa stronę użytkownika z kategorii', apply_cosmetic_changes=False)
         else:
             pywikibot.output(u'Strona użytkownika OK')
         return
 
     def run(self, arg):
-        print('Background USER page %s. Kat:%i Depth:%i' % (arg.title(), len(list(arg.categories())), arg.depth ))
+        pywikibot.output('Background USER page %s. Kat:%i Depth:%i' % (arg.title(), len(list(arg.categories())), arg.depth ))
         if arg.depth > 0:
             self.checkUserPage(arg)
 
@@ -103,6 +103,15 @@ class newArticleThread(object):
         catExists = False
         linksExists = False
         comma = False
+
+        # reget the page after sleep period
+        try:
+            page.get(force=True)
+        except NoPage:
+            pywikibot.output(u'Page removed:%s' % page.title)
+        else:
+            pass
+
         text = page.text
 
         #check for obvious experiments
@@ -111,27 +120,28 @@ class newArticleThread(object):
         #    page.save(summary=u'{{ek}} - artykuł nie zawiera spacji, prawdopodobnie eksperyment edycyjny')
         #    return
 
+
         # check for disambig
         if page.isDisambig() or u'{{Ujednoznacznienie' in page.text or u'{{ujednoznacznienie' in page.text:
-            pywikibot.output(u'Disambig')
+            pywikibot.output(u'Disambig:%s' % page.title())
             return
         # check if new page has categories
         if len(list(page.categories())):
-            pywikibot.output(u'Kategorie OK')
+            pywikibot.output(u'Kategorie OK:%s' % page.title())
             catExists = True
         elif not self.catsPresent(text):
-            pywikibot.output(u'Brak kategorii')
+            pywikibot.output(u'Brak kategorii:%s' % page.title())
         else:
             catExists = True
             pywikibot.output(u'Kategorie OK - API=0')
         # check if new page has wikilinks
         if self.linksPresent(text):
-            pywikibot.output(u'Linki OK')
+            pywikibot.output(u'Linki OK:%s' % page.title())
             linksExists = True
         else:
-            pywikibot.output(u'Brak linków')
+            pywikibot.output(u'Brak linków:%s' % page.title())
 
-        pywikibot.output(u'Cat:%s Lnk:%s' % (catExists,linksExists))
+        pywikibot.output(u'Cat:%s Lnk:%s: Time:%s' % (catExists,linksExists, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
         if not (catExists and linksExists):
             templ = u'{{Dopracować'
             summary = u'Sprawdzanie nowych stron, w artykule należy dopracować:'
@@ -146,11 +156,13 @@ class newArticleThread(object):
                 summary += u'linki'
             templ += u'}}\n'
             page.text = templ + text
-            page.save(summary=summary,async=True)
+            #page.save(summary=summary,async=True)
         return
 
     def run(self, arg):
-        print('Background page %s. Kat:%i Depth:%i' % (arg.title(), len(list(arg.categories())), arg.depth ))
+        pywikibot.output('Background page %s. Kat:%i Depth:%i Time:%s' % (arg.title(), len(list(arg.categories())), arg.depth, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') ))
+        pywikibot.output(u'Waiting ...')
+        time.sleep(60)
         self.checkNewArticle(arg)
 
 
@@ -226,7 +238,7 @@ class ArtNoDisp(SingleServerIRCBot):
             if not page.isRedirectPage():
                 NAthread = newArticleThread((page,))
             else:
-                print u'skipping'
+                pywikibot.output(u'skipping')
 
             #print 'new article'
             #currtime = strftime("%Y-%m-%d %H:%M:%S", datetime.datetime.now().time())
