@@ -110,6 +110,7 @@ class newArticleThread(object):
             page.get(force=True)
         except pywikibot.NoPage:
             pywikibot.output(u'Page removed:%s' % page.title())
+            return
         else:
             pass
 
