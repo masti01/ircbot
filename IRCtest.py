@@ -107,7 +107,7 @@ class newArticleThread(object):
         # reget the page after sleep period
         try:
             page.get(force=True)
-        except NoPage:
+        except pywikibot.NoPage:
             pywikibot.output(u'Page removed:%s' % page.title)
         else:
             pass
