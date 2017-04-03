@@ -144,7 +144,7 @@ class newArticleThread(object):
             pywikibot.output(u'Brak linków:%s' % page.title())
 
         pywikibot.output(u'Cat:%s Lnk:%s: Time:%s' % (catExists,linksExists, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
-        if not (catExists and linksExists):
+        if not (catExists and linksExists) and not u'{{Dopracować' in page.text:
             templ = u'{{Dopracować'
             summary = u'Sprawdzanie nowych stron, w artykule należy dopracować:'
             if not catExists:
