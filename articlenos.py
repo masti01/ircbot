@@ -15,6 +15,7 @@ http://python-irclib.sourceforge.net/
 __version__ = '$Id: articlenos.py 11550 2013-05-18 19:42:20Z drtrigon $'
 
 import re
+import threading
 
 import pywikibot
 #import externals
