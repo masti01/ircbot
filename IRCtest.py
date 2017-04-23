@@ -124,8 +124,12 @@ class newArticleThread(object):
 
 
         # check for disambig
-        if page.isDisambig() or u'{{Ujednoznacznienie' in page.text or u'{{ujednoznacznienie' in page.text:
+        if page.isDisambig() or u'{{ujednoznacznienie' in page.text.lower():
             pywikibot.output(u'Disambig:%s' % page.title())
+            return
+        # check for speedy delete
+        if u'{{ek' in page.text.lower():
+            pywikibot.output(u'EK:%s' % page.title())
             return
         # check if new page has categories
         if len(list(page.categories())):
