@@ -168,7 +168,7 @@ class newArticleThread(object):
     def run(self, arg):
         pywikibot.output('Background page %s. Kat:%i Depth:%i Time:%s, Threads:%s' % (arg.title(), len(list(arg.categories())), arg.depth, datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), threading.activeCount() ))
         pywikibot.output(u'Waiting ...')
-        time.sleep(180)
+        time.sleep(600)
         self.checkNewArticle(arg)
 
 
