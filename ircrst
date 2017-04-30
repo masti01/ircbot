@@ -1,20 +1,14 @@
-#ps aux | grep IRC -c
-#echo $?
-#if [[ $? -ne 1 ]] ; then
-#        echo "Restarting IRCbot:     $(date)"
-#        python pwb.py ircbot/IRCtest.py
-#fi
 case "$(ps aux | grep IRC -c)" in
 
-0)  echo "what? not even grep?:     $(date)"
+0)  echo "what? not even grep?:     $(date)" >> ~/pw/core/logs/reset.log
     ;;
 
-1)  echo "Restarting IRCbot:     $(date)"
+1)  echo "Restarting IRCbot:     $(date)"  >> ~/pw/core/logs/reset.log
     python pwb.py ircbot/IRCtest.py &
     ;;
 2)  echo "all ok"
     ;;
-*)  echo "Removed double IRC: $(date)"
+*)  echo "Removed double IRC: $(date)"  >> ~/pw/core/logs/reset.log
     #kill $(pidof amadeus.x86 | awk '{print $1}')
     ;;
 esac
