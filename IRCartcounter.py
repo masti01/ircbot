@@ -88,15 +88,6 @@ class ArtNoDisp(SingleServerIRCBot):
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
 
         if newArt and (page.namespace() == 0):
-            # try threading
-            if not page.isRedirectPage():
-                NAthread = newArticleThread((page,))
-            else:
-                pywikibot.output(u'skipping')
-
-            #print 'new article'
-            #currtime = strftime("%Y-%m-%d %H:%M:%S", datetime.datetime.now().time())
-            
             text = self.site.getUrl(self.apiURL)
             artsR = re.compile(ur'articles="(?P<arts>.*?)"')
             match = artsR.search(text)
