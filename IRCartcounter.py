@@ -17,6 +17,7 @@ __version__ = '$Id: 229b3e02cf110f5e9d7f8d16c60906ee9769b7af $'
 import re
 import threading
 from pywikibot import textlib
+import sys
 
 import pywikibot
 import datetime, time
@@ -34,7 +35,7 @@ class ArtNoDisp(SingleServerIRCBot):
         self.site = site
         self.lang = site.language()
         self.apiURL = u'https://'+self.lang+site.family.name+u'.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml'
-        self.logname = u'ircbot/artnos'+self.lang+u.log'
+        self.logname = u'ircbot/artnos'+self.lang+u'.log'
 
         ns = []
         for n in site.namespaces():
@@ -130,7 +131,10 @@ class ArtNoDisp(SingleServerIRCBot):
 
 
 def main():
-    site = pywikibot.getSite()
+    for arg in sys.argv:
+        if arg.startswith('-lang:'):
+            lang = arg[6:]
+    site = pywikibot.Site(lang,fam='wikipedia')
     #site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
 
