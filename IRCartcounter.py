@@ -86,7 +86,6 @@ class ArtNoDisp(SingleServerIRCBot):
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s' % (mpage,mflags,muser,mbytes,msummary,murl,currtime)).encode('UTF-8')
         newArt = 'N' in mflags
         page = pywikibot.Page(self.site, mpage)
-        print self.apiURL
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
 
         if newArt and (page.namespace() == 0):
