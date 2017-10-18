@@ -18,6 +18,7 @@ import re
 import threading
 from pywikibot import textlib
 import sys
+import ssl
 
 import pywikibot
 import datetime, time
@@ -34,7 +35,7 @@ class ArtNoDisp(SingleServerIRCBot):
         self.channel = channel
         self.site = site
         self.lang = site.language()
-        self.apiURL = u'https://'+self.lang+site.family.name+u'.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml'
+        self.apiURL = u'https://'+self.lang+u'.'+site.family.name+u'.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml'
         self.logname = u'ircbot/artnos'+self.lang+u'.log'
 
         ns = []
@@ -85,9 +86,11 @@ class ArtNoDisp(SingleServerIRCBot):
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s' % (mpage,mflags,muser,mbytes,msummary,murl,currtime)).encode('UTF-8')
         newArt = 'N' in mflags
         page = pywikibot.Page(self.site, mpage)
+        print self.apiURL
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
 
         if newArt and (page.namespace() == 0):
+            #text = self.site.getUrl(u'https://tr.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
             text = self.site.getUrl(self.apiURL)
             artsR = re.compile(ur'articles="(?P<arts>.*?)"')
             match = artsR.search(text)
