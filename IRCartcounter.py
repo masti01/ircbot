@@ -19,6 +19,7 @@ import threading
 from pywikibot import textlib
 import sys
 import ssl
+import os
 
 import pywikibot
 import datetime, time
@@ -123,10 +124,24 @@ class ArtNoDisp(SingleServerIRCBot):
         pass
 
 
+def savepid(suffix):
+        """ get script name and pid, save it in scriptname.pid"""
+        scrR = ur'.*\/(.*?)\.py'
+        script = re.sub(scrR,ur'\1',sys.argv[0])
+        pid = os.getpid()
+        print script
+        print pid
+        logname = u'masti/pid/' + script + suffix + u'.pid'
+        pidfile = open(logname,"w")
+        pidfile.write(str(pid)+u'\n')
+        pidfile.close()
+        return
+
 def main():
     for arg in sys.argv:
         if arg.startswith('-lang:'):
             lang = arg[6:]
+    savepid(u'-'+lang)
     site = pywikibot.Site(lang,fam='wikipedia')
     #site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
