@@ -14,6 +14,8 @@ http://python-irclib.sourceforge.net/
 # License : LGPL
 __version__ = '$Id: 229b3e02cf110f5e9d7f8d16c60906ee9769b7af $'
 
+from __future__ import absolute_import, unicode_literals
+
 import re
 import threading
 from pywikibot import textlib
