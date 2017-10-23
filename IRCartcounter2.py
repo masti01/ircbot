@@ -38,7 +38,7 @@ class ArtNoDisp(SingleServerIRCBot):
         self.site = site
         self.lang = site.language()
         self.apiURL = u'https://'+self.lang+u'.'+site.family.name+u'.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml'
-        self.logname = u'ircbot/artnos'+self.lang+u'.log'
+        self.logname = u'ircbot/artnos'+self.lang+u'-test.log'
 
         ns = []
         for n in site.namespaces():
