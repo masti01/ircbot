@@ -85,7 +85,7 @@ class ArtNoDisp(SingleServerIRCBot):
         page = pywikibot.Page(self.site, mpage)
         #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
 
-        if newArt and (page.namespace() == 0):
+        #if newArt and (page.namespace() == 0):
         if newArt and (page.namespace() in (0,6,10)):
             #text = self.site.getUrl(u'https://tr.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
             text = self.site.getUrl(self.apiURL)
@@ -137,7 +137,7 @@ def main():
     for arg in sys.argv:
         if arg.startswith('-lang:'):
             lang = arg[6:]
-    savepid(u'-'+lang)
+    savepid(u'-'+lang+u'-test')
     site = pywikibot.Site(lang,fam='wikipedia')
     #site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
