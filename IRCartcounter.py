@@ -12,9 +12,8 @@ http://python-irclib.sourceforge.net/
 # Author: Balasyum
 # http://hu.wikipedia.org/wiki/User:Balasyum
 # License : LGPL
-__version__ = '$Id: 229b3e02cf110f5e9d7f8d16c60906ee9769b7af $'
-
 from __future__ import absolute_import, unicode_literals
+__version__ = '$Id: 229b3e02cf110f5e9d7f8d16c60906ee9769b7af $'
 
 import re
 import threading
