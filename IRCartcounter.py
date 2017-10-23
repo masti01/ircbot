@@ -66,8 +66,10 @@ class ArtNoDisp(SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         #pywikibot.output(c)
         #pywikibot.output(e)
-        source = unicode(e.source().split ( '!' ) [ 0 ], 'utf-8')
-        text = unicode(e.arguments() [ 0 ], 'utf-8')
+        #source = unicode(e.source().split ( '!' ) [ 0 ], 'utf-8')
+        #text = unicode(e.arguments() [ 0 ], 'utf-8')
+        source = e.source().split ( '!' ) [ 0 ]
+        text = e.arguments() [ 0 ]
         #pywikibot.output(u'CONNECTION:%s' % unicode(c[ 0 ], 'utf-8'))
         #pywikibot.output(u'SOURCE:%s' % source)
         #if u'move' in text:
