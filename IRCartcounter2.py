@@ -94,6 +94,8 @@ class ArtNoDisp(SingleServerIRCBot):
             arts = match.group('arts')
             #pywikibot.output(u'Liczba artykułów:%s' % arts)
             logfile = open(self.logname,"a")
+            if page.namespace():
+                logline = arts + ';' + currtime + ';A;' + mpage + u';\n'
             if page.isRedirectPage():
                 try:
                     logline = arts + ';' + currtime + ';R;' + mpage +';' + page.getRedirectTarget().title() + u'\n'
