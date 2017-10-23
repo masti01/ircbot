@@ -142,7 +142,7 @@ def main():
     #site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
 
-    bot = ArtNoDisp(site, chan, 'mastiBotIRC', "irc.wikimedia.org")
+    bot = ArtNoDisp(site, chan, 'mBotIRCtest', "irc.wikimedia.org")
     bot.start()
     
 
