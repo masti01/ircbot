@@ -112,7 +112,7 @@ class ArtNoDisp(SingleServerIRCBot):
             logfile.close()
             #print 'look ma, thread is not alive: ', thread.is_alive()
         else:
-            pywikibot.output(u'Skipping:%s' % page.title())
+            pywikibot.output(u'%s:Skipping:%s' % (currtime,page.title()))
 
     def on_dccmsg(self, c, e):
         pass
