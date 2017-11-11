@@ -80,9 +80,6 @@ class ArtNoDisp(SingleServerIRCBot):
         move = False
         
         match = self.re_edit.match(e.arguments()[0])
-        if not match:
-                return
-        match = self.re_edit.match(e.arguments()[0])
         matchmove = self.re_move.match(e.arguments()[0])
         if match:
             edit = True
