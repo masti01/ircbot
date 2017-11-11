@@ -119,7 +119,7 @@ class ArtNoDisp(SingleServerIRCBot):
             pywikibot.output (u'MOVE->F:%s:T:%s:AT:%s:S:%s:SU:%s:T:%s' % (mvpagefrom,mvpageto,mvaction,mvuser,mvsummary,currtime))
             frompage = pywikibot.Page(self.site, mvpagefrom)
             topage = pywikibot.Page(self.site, mvpageto)
-            if topage.namespace() == 0:
+            if topage.namespace() == 0 and not frompage.namespace == 0:
                 #NAthread = newArticleThread((topage,))
 
                 #register edit
