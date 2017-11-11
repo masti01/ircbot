@@ -52,7 +52,7 @@ class ArtNoDisp(SingleServerIRCBot):
             r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'.replace(
                 '^B', '\002').replace('^C', '\003').replace('^U', '\037'))
         self.re_move = re.compile(
-            ur'^C14\[\[^C07Specjalna\:Log\/move^C14]]^C4 (?P<actionu>.+?)^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]^C(\: (?P<summary>.*))?'.replace('^C', '\003'))
+            ur'^C14\[\[^C07Specjalna\:Log\/move^C14]]^C4 (?P<actionu>.+?)^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]^C(\: (?P<url>.*))?'.replace('^C', '\003'))
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
