@@ -25,8 +25,6 @@ import os
 import pywikibot
 import datetime, time
 from time import strftime
-#import externals
-#externals.check_setup('irclib')
 import irclib
 from ircbot import SingleServerIRCBot
 
@@ -53,6 +51,9 @@ class ArtNoDisp(SingleServerIRCBot):
         self.re_edit = re.compile(
             r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'.replace(
                 '^B', '\002').replace('^C', '\003').replace('^U', '\037'))
+        self.re_move = re.compile(
+            r'\00314\[\[\00307Specjalna\:Log\/move\00314]]\0034 (?P<actionu>.+?)\00310 \00302\003 \0035\*\003 \00303(?P<user>.+?)\003 \0035\*\003  \00310(?P<action>.+?) \[\[\00302(?P<frompage>.+?)\00310]] to \[\[(?P<topage>.+?)]]\: (?P<url>.+?)\003'.replace('^C', '\003'))
+
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -74,46 +75,93 @@ class ArtNoDisp(SingleServerIRCBot):
         #pywikibot.output(u'SOURCE:%s' % source)
         #if u'move' in text:
         #    pywikibot.output(u'TEXT move:%s' % text)
-        
+    
+        edit = False
+        move = False
         
         match = self.re_edit.match(e.arguments()[0])
         if not match:
                 return
+        match = self.re_edit.match(e.arguments()[0])
+        matchmove = self.re_move.match(e.arguments()[0])
+        if match:
+            edit = True
+        elif matchmove:
+            move = True
+        if move:
+            mvpagefrom = unicode(matchmove.group('frompage'), 'utf-8')        
+            mvpageto = unicode(matchmove.group('topage'), 'utf-8')        
+            mvactionu = unicode(matchmove.group('actionu'), 'utf-8')        
+            mvaction = unicode(matchmove.group('action'), 'utf-8')        
+            mvurl = unicode(matchmove.group('url'), 'utf-8')
+            mvuser = unicode(matchmove.group('user'), 'utf-8')
+            currtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            pywikibot.output (u'MOVE->F:%s:T:%s:A:%s:AT:%s:S:%s:U:%s:T:%s' % (mvpagefrom,mvpageto,mvactionu,mvaction,mvuser,mvurl,currtime))
+            frompage = pywikibot.Page(self.site, mvpagefrom)
+            topage = pywikibot.Page(self.site, mvpageto)
+            if topage.namespace() == 0:
+                #NAthread = newArticleThread((topage,))
 
-        mpage = unicode(match.group('page'), 'utf-8')        
-        mflags = unicode(match.group('flags'), 'utf-8')
-        murl = unicode(match.group('url'), 'utf-8')    
-        muser = unicode(match.group('user'), 'utf-8')
-        mbytes = unicode(match.group('bytes'), 'utf-8')
-        msummary = unicode(match.group('summary'), 'utf-8')
-        currtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s' % (mpage,mflags,muser,mbytes,msummary,murl,currtime)).encode('UTF-8')
-        newArt = 'N' in mflags
-        page = pywikibot.Page(self.site, mpage)
-        #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
+                #register edit
+                text = self.site.getUrl('https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
+                #print text.encode('UTF-8')
+                artsR = re.compile(ur'articles="(?P<arts>.*?)"')
+                match = artsR.search(text)
+                arts = match.group('arts')
+                #pywikibot.output(u'Liczba artykułów:%s' % arts)
+                logfile = open(self.logname,"a")
+                if topage.isRedirectPage():
+                    logline = arts + ';' + currtime + ';RM;' + mvpageto +';' + page.getRedirectTarget().title() + u'\n'
+                else:
+                    logline = arts + ';' + currtime + ';AM;' + mvpageto + u';\n'
+                pywikibot.output(logline.encode('UTF-8'))
+                logfile.write(logline.encode('UTF-8'))
+                logfile.close()
 
-        if newArt and (page.namespace() == 0):
-            #text = self.site.getUrl(u'https://tr.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
-            text = self.site.getUrl(self.apiURL)
-            artsR = re.compile(ur'articles="(?P<arts>.*?)"')
-            match = artsR.search(text)
-            arts = match.group('arts')
-            #pywikibot.output(u'Liczba artykułów:%s' % arts)
-            logfile = open(self.logname,"a")
-            if page.isRedirectPage():
-                try:
+        elif edit:
+            mflags = unicode(match.group('flags'), 'utf-8')
+            murl = unicode(match.group('url'), 'utf-8')    
+            muser = unicode(match.group('user'), 'utf-8')
+            mbytes = unicode(match.group('bytes'), 'utf-8')
+            mpage = unicode(match.group('page'), 'utf-8')        
+            msummary = unicode(match.group('summary'), 'utf-8')
+            currtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s' % (mpage,mflags,muser,mbytes,msummary,murl,currtime)).encode('UTF-8')
+            newArt = 'N' in mflags
+            page = pywikibot.Page(self.site, mpage)
+            #print (u'P:%s:F:%s:U:%s:B:%s:S:%s:U:%s:T:%s:NS:%i' % (mpage,mflags,muser,mbytes,msummary,murl,currtime,page.namespace())).encode('UTF-8')
+
+            if newArt and (page.namespace() == 0):
+                # try threading
+                if not page.isRedirectPage():
+                    #NAthread = newArticleThread((page,))
+                    pass
+                else:
+                    pywikibot.output(u'skipping')
+
+                #print 'new article'
+                #currtime = strftime("%Y-%m-%d %H:%M:%S", datetime.datetime.now().time())
+            
+                #register edit
+                text = self.site.getUrl('https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
+                #print text.encode('UTF-8')
+                artsR = re.compile(ur'articles="(?P<arts>.*?)"')
+                match = artsR.search(text)
+                arts = match.group('arts')
+                #pywikibot.output(u'Liczba artykułów:%s' % arts)
+                logfile = open(self.logname,"a")
+                if page.isRedirectPage():
                     logline = arts + ';' + currtime + ';R;' + mpage +';' + page.getRedirectTarget().title() + u'\n'
-                except:
-                    logline = arts + ';' + currtime + ';R;' + mpage +';\n'
+                else:
+                    logline = arts + ';' + currtime + ';A;' + mpage + u';\n'
+                pywikibot.output(logline.encode('UTF-8'))
+                logfile.write(logline.encode('UTF-8'))
+                logfile.close()
+                #print 'look ma, thread is not alive: ', thread.is_alive()
+            #elif page.namespace() == 2:
+            #    UPthread = userPageThread((page,))
             else:
-                logline = arts + ';' + currtime + ';A;' + mpage + u';\n'
-            pywikibot.output(logline.encode('UTF-8'))
-            logfile.write(logline.encode('UTF-8'))
-            logfile.close()
-            #print 'look ma, thread is not alive: ', thread.is_alive()
-        else:
-            pywikibot.output(u'%s:Skipping:%s' % (currtime,page.title()))
-
+                pywikibot.output(u'Skipping:%s' % page.title())
     def on_dccmsg(self, c, e):
         pass
 
