@@ -52,7 +52,11 @@ class ArtNoDisp(SingleServerIRCBot):
             r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'.replace(
                 '^B', '\002').replace('^C', '\003').replace('^U', '\037'))
         self.re_move = re.compile(
-            ur'^C14\[\[^C07Specjalna\:Log\/move^C14]]^C4 (?P<actionu>.+?)^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]((?P<summary>.*))?^C'.replace('^C', '\003'))
+            ur'^C14\[\[^C07(?P<page>.+?)^C14]]^C4 move^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]((?P<summary>.*))?^C'.replace('^C', '\003'))
+        self.re_move_redir = re.compile(
+            ur'^C14\[\[^C07(?P<page>.+?)^C14]]^C4 move_redir^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]] over redirect: ((?P<summary>.*))?^C'.replace('^C', '\003'))
+        self.re_delete_redir = re.compile(
+            ur'^C14\[\[^C07(?P<page>.+?)^C14]]^C4 delete_redir^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10\]\](?P<reason>.*?):(?P<comment>.*?„\[\[(?P<topage>.*?\]\])”)^C'.replace('^C', '\003'))
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -78,20 +82,33 @@ class ArtNoDisp(SingleServerIRCBot):
     
         edit = False
         move = False
+        move_redir = False
+        delete_redir = False
         
         match = self.re_edit.match(e.arguments()[0])
         matchmove = self.re_move.match(e.arguments()[0])
+        matchmoveredir = self.re_move_redir.match(e.arguments()[0])
+        matchdeleteredir = self.re_delete_redir.match(e.arguments()[0])
+
         if match:
             edit = True
-            pywikibot.output(u'EDIT')
+            #pywikibot.output(u'EDIT')
         elif matchmove:
             move = True
-            pywikibot.output(u'MOVE')
+            #pywikibot.output(u'MOVE')
+        elif matchmoveredir:
+            move_redir = True
+            matchmove = matchmoveredir
+            #pywikibot.output(u'MOVE_REDIR')
+        elif matchdeleteredir:
+            delete_redir = True
+            matchmove = matchdeleteredir
+            #pywikibot.output(u'DELETE_REDIR')
 
-        if move:
-            mvpagefrom = unicode(matchmove.group('frompage'), 'utf-8')        
+        if move or move_redir or delete_redir:
+            mvpagefrom = unicode(matchmove.group('frompage'), 'utf-8') 
             mvpageto = unicode(matchmove.group('topage'), 'utf-8')        
-            mvactionu = unicode(matchmove.group('actionu'), 'utf-8')        
+            #mvactionu = unicode(matchmove.group('actionu'), 'utf-8')        
             mvaction = unicode(matchmove.group('action'), 'utf-8')
             if matchmove.group('summary'):
                 mvsummary = unicode(matchmove.group('summary'), 'utf-8')
@@ -99,7 +116,7 @@ class ArtNoDisp(SingleServerIRCBot):
                 mvsummary = u''
             mvuser = unicode(matchmove.group('user'), 'utf-8')
             currtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            pywikibot.output (u'MOVE->F:%s:T:%s:A:%s:AT:%s:S:%s:SU:%s:T:%s' % (mvpagefrom,mvpageto,mvactionu,mvaction,mvuser,mvsummary,currtime))
+            pywikibot.output (u'MOVE->F:%s:T:%s:AT:%s:S:%s:SU:%s:T:%s' % (mvpagefrom,mvpageto,mvaction,mvuser,mvsummary,currtime))
             frompage = pywikibot.Page(self.site, mvpagefrom)
             topage = pywikibot.Page(self.site, mvpageto)
             if topage.namespace() == 0:
