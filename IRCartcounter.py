@@ -52,7 +52,7 @@ class ArtNoDisp(SingleServerIRCBot):
             r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02(?P<url>.+?)^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C \(?^B?(?P<bytes>[+-]?\d+?)^B?\) ^C10(?P<summary>.*)^C'.replace(
                 '^B', '\002').replace('^C', '\003').replace('^U', '\037'))
         self.re_move = re.compile(
-            ur'^C14\[\[^C07Specjalna\:Log\/move^C14]]^C4 (?P<actionu>.+?)^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]^C(\: (?P<url>.*))?'.replace('^C', '\003'))
+            ur'^C14\[\[^C07Specjalna\:Log\/move^C14]]^C4 (?P<actionu>.+?)^C10 ^C02^C ^C5\*^C ^C03(?P<user>.+?)^C ^C5\*^C  ^C10(?P<action>.+?) \[\[^C02(?P<frompage>.+?)^C10]] to \[\[(?P<topage>.+?)]]((?P<summary>.*))?^C'.replace('^C', '\003'))
 
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + "_")
@@ -70,6 +70,7 @@ class ArtNoDisp(SingleServerIRCBot):
         #text = unicode(e.arguments() [ 0 ], 'utf-8')
         source = e.source().split ( '!' ) [ 0 ]
         text = e.arguments() [ 0 ]
+        #print text
         #pywikibot.output(u'CONNECTION:%s' % unicode(c[ 0 ], 'utf-8'))
         #pywikibot.output(u'SOURCE:%s' % source)
         #if u'move' in text:
@@ -82,17 +83,23 @@ class ArtNoDisp(SingleServerIRCBot):
         matchmove = self.re_move.match(e.arguments()[0])
         if match:
             edit = True
+            pywikibot.output(u'EDIT')
         elif matchmove:
             move = True
+            pywikibot.output(u'MOVE')
+
         if move:
             mvpagefrom = unicode(matchmove.group('frompage'), 'utf-8')        
             mvpageto = unicode(matchmove.group('topage'), 'utf-8')        
             mvactionu = unicode(matchmove.group('actionu'), 'utf-8')        
-            mvaction = unicode(matchmove.group('action'), 'utf-8')        
-            mvurl = unicode(matchmove.group('url'), 'utf-8')
+            mvaction = unicode(matchmove.group('action'), 'utf-8')
+            if matchmove.group('summary'):
+                mvsummary = unicode(matchmove.group('summary'), 'utf-8')
+            else:
+                mvsummary = u''
             mvuser = unicode(matchmove.group('user'), 'utf-8')
             currtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            pywikibot.output (u'MOVE->F:%s:T:%s:A:%s:AT:%s:S:%s:U:%s:T:%s' % (mvpagefrom,mvpageto,mvactionu,mvaction,mvuser,mvurl,currtime))
+            pywikibot.output (u'MOVE->F:%s:T:%s:A:%s:AT:%s:S:%s:SU:%s:T:%s' % (mvpagefrom,mvpageto,mvactionu,mvaction,mvuser,mvsummary,currtime))
             frompage = pywikibot.Page(self.site, mvpagefrom)
             topage = pywikibot.Page(self.site, mvpageto)
             if topage.namespace() == 0:
@@ -178,22 +185,26 @@ def savepid(suffix):
         pid = os.getpid()
         print script
         print pid
-        logname = u'masti/pid/' + script + suffix + u'.pid'
-        pidfile = open(logname,"w")
+        pidname = u'masti/pid/' + script + suffix + u'.pid'
+        pidfile = open(pidname,"w")
         pidfile.write(str(pid)+u'\n')
         pidfile.close()
         return
 
 def main():
+
+    botname = 'mastiBotIRC'
     for arg in sys.argv:
         if arg.startswith('-lang:'):
             lang = arg[6:]
+        if arg.startswith('-name:'):
+            botname = arg[6:]
     savepid(u'-'+lang)
     site = pywikibot.Site(lang,fam='wikipedia')
     #site.forceLogin()
     chan = '#' + site.language() + '.' + site.family.name
 
-    bot = ArtNoDisp(site, chan, 'mastiBotIRC', "irc.wikimedia.org")
+    bot = ArtNoDisp(site, chan, botname, "irc.wikimedia.org")
     bot.start()
     
 
