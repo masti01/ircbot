@@ -123,7 +123,7 @@ class ArtNoDisp(SingleServerIRCBot):
                 #NAthread = newArticleThread((topage,))
 
                 #register edit
-                text = self.site.getUrl('https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
+                text = self.site.getUrl(self.apiURL)
                 #print text.encode('UTF-8')
                 artsR = re.compile(ur'articles="(?P<arts>.*?)"')
                 match = artsR.search(text)
@@ -163,7 +163,7 @@ class ArtNoDisp(SingleServerIRCBot):
                 #currtime = strftime("%Y-%m-%d %H:%M:%S", datetime.datetime.now().time())
             
                 #register edit
-                text = self.site.getUrl('https://pl.wikipedia.org/w/api.php?action=query&meta=siteinfo&siprop=statistics&format=xml')
+                text = self.site.getUrl(self.apiURL)
                 #print text.encode('UTF-8')
                 artsR = re.compile(ur'articles="(?P<arts>.*?)"')
                 match = artsR.search(text)
