@@ -184,7 +184,7 @@ class ArtNoDisp(SingleServerIRCBot):
             #elif page.namespace() == 2:
             #    UPthread = userPageThread((page,))
             else:
-                pywikibot.output(u'Skipping:%s' % page.title())
+                pywikibot.output(u'[%s] Skipping:%s' % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),page.title()))
     def on_dccmsg(self, c, e):
         pass
 
