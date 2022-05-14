@@ -70,7 +70,6 @@ import sys
 import time
 import types
 
-import long as long
 
 VERSION = 0, 4, 6
 DEBUG = 0
